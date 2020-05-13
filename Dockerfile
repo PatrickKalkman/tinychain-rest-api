@@ -4,7 +4,6 @@ LABEL maintainer="patrick@simpletechture.nl"
 ENV PYTHONUNBUFFERED 1
 
 # Install dependencies
-# Install dependencies
 COPY ./requirements.txt /requirements.txt
 RUN apk add --update --no-cache postgresql-client
 RUN apk add --update --no-cache --virtual .tmp-build-deps \
