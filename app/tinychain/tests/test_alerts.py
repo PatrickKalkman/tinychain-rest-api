@@ -40,19 +40,20 @@ class PrivateAlertsApiTests(TestCase):
     def test_retrieve_alers(self):
         """Test retrieving alerts"""
         Alert.objects.create(user=self.user,
-                             exchange='kraken',
+                             exchange='Kraken',
                              coinpair='EUR:BTC',
                              indicator='>',
                              limit=8200.00)
         Alert.objects.create(user=self.user,
-                             exchange='kraken',
+                             exchange='Binance',
                              coinpair='EUR:ETH',
                              indicator='<',
                              limit=150.00)
 
         res = self.client.get(ALERTS_URL)
 
-        alerts = Alert.objects.all().order_by('-exchange')
+        alerts = Alert.objects.all().order_by(
+            '-exchange').order_by('-coinpair')
         serializer = AlertSerializer(alerts, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, serializer.data)
