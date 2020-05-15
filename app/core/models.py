@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
     PermissionsMixin
 
@@ -35,3 +36,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class Alert(models.Model):
+    """Alert model to define a custom alert"""
+    exchange = models.CharField(max_length=255)
+    coinpair = models.CharField(max_length=255)
+    indicator = models.CharField(max_length=1)
+    limit = models.DecimalField(max_digits=10, decimal_places=5)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'{self.coinpair} {self.indicator} {self.limit}'
