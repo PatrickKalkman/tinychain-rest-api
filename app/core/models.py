@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
@@ -32,6 +33,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    verified = models.BooleanField(default=False)
+    verification_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     objects = UserManager()
 

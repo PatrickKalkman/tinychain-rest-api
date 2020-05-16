@@ -24,3 +24,5 @@ RUN chmod +x /app/entrypoint.sh
 WORKDIR /app
 
 USER user
+
+ENTRYPOINT ["/app/entrypoint.sh"]

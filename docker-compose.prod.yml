@@ -1,0 +1,77 @@
+version: "3"
+
+services:
+  reverse-proxy:
+    # The official v2 Traefik docker image
+    image: traefik:v2.2
+    # Enables the web UI and tells Traefik to listen to docker
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/data/traefik.yml:/traefik.yml:ro
+      - ./traefik/data/acme.json:/acme.json
+      - ./traefik/data/config.yml:/config.yml:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.entrypoints=http"
+      - "traefik.http.routers.traefik.rule=Host(`tinychain-proxy.simpletechture.nl`)"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=pkalkman:$$apr1$$9.fR7Fiw$$WwJDXddUMmQsMdj4BvyaX1"
+      - "traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.traefik.middlewares=traefik-https-redirect"
+      - "traefik.http.routers.traefik-secure.entrypoints=https"
+      - "traefik.http.routers.traefik-secure.rule=Host(`tinychain-proxy.simpletechture.nl`)"
+      - "traefik.http.routers.traefik-secure.middlewares=traefik-auth"
+      - "traefik.http.routers.traefik-secure.tls=true"
+      - "traefik.http.routers.traefik-secure.tls.certresolver=http"
+      - "traefik.http.routers.traefik-secure.service=api@internal"
+
+  app:
+    image: pkalkman/tinychain:0.1.7
+    expose:
+      - 8000
+    networks:
+        - proxy
+    volumes:
+      - static_volume:/app/staticfiles
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.rule=Host(`tinychain-api.simpletechture.nl`)"
+      - "traefik.http.routers.app.entrypoints=https"
+      - "traefik.http.routers.app.tls.certresolver=http"
+
+  db:
+    image: postgres:10-alpine
+    networks:
+      - proxy
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=app
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=supersecretpassword
+    depends_on:
+      - reverse-proxy
+
+volumes:
+  postgres_data:
+  static_volume:
+
+networks:
+  proxy:
+    external: true
