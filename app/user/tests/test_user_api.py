@@ -9,6 +9,7 @@ from rest_framework import status
 CREATE_USER_URL = reverse('user:create')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
+ME_VALIDATE = reverse('user:validate')
 
 
 def create_user(**params):
@@ -101,13 +102,38 @@ class PublicUserApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
+    def test_verification_verifies_user(self):
+        """Test that calling the verification link verifies the user"""
+        self.user = create_user(
+            email='test@londonappdev.com',
+            password='testpass',
+            name='name',
+        )
+        url = f'{ME_VALIDATE}?verification_id={self.user.verification_id}'
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.verified)
+
+    def test_no_verification_id_returns_bad_request(self):
+        """Test that calling without verification id return error"""
+        res = self.client.get(ME_VALIDATE)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_not_existing_verification_id_returns_bad_request(self):
+        """Test that calling not existing verification id return error"""
+        uuid = '2cae0c47-2e62-4cc4-9d7e-6edc96e9d042'
+        url = f'{ME_VALIDATE}?verification_id={uuid}'
+        res = self.client.get(url)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
 
 class PrivateUserApiTests(TestCase):
     """Test API requests that require authentication"""
 
     def setUp(self):
         self.user = create_user(
-            email='test@londonappdev.com',
+            email='test@simpletechture.nl',
             password='testpass',
             name='fname',
         )
@@ -140,3 +166,4 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(self.user.name, payload['name'])
         self.assertTrue(self.user.check_password(payload['password']))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+

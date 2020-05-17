@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
     PermissionsMixin
 
+from core.tasks import send_verification_email
+
 
 class UserManager(BaseUserManager):
 
@@ -39,6 +41,15 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+def user_post_save(sender, instance, signal, *args, **kwargs):
+    if not instance.verified:
+        # Send verification email
+        send_verification_email.delay(instance.pk)
+
+
+models.signals.post_save.connect(user_post_save, sender=User)
 
 
 class Alert(models.Model):

@@ -2,9 +2,7 @@ version: "3"
 
 services:
   reverse-proxy:
-    # The official v2 Traefik docker image
     image: traefik:v2.2
-    # Enables the web UI and tells Traefik to listen to docker
     container_name: traefik
     restart: unless-stopped
     security_opt:
@@ -35,7 +33,7 @@ services:
       - "traefik.http.routers.traefik-secure.service=api@internal"
 
   app:
-    image: pkalkman/tinychain:0.1.7
+    image: pkalkman/tinychain:0.1.8
     expose:
       - 8000
     networks:
@@ -54,6 +52,24 @@ services:
       - "traefik.http.routers.app.rule=Host(`tinychain-api.simpletechture.nl`)"
       - "traefik.http.routers.app.entrypoints=https"
       - "traefik.http.routers.app.tls.certresolver=http"
+
+    celery:
+      image: pkalkman/tinychain:0.1.8
+      command:
+        celery -A app worker -l info
+      environment:
+          - DB_HOST=db
+          - DB_NAME=app
+          - DB_USER=postgres
+          - DB_PASS=supersecretpassword
+          - REDIS_HOST=redis
+          - REDIS_PORT=6379
+      depends_on:
+          - redis
+          - db
+
+  redis:
+    image: redis:6.0-alpine
 
   db:
     image: postgres:10-alpine
