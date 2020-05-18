@@ -50,5 +50,9 @@ class AuthTokenSerializer(serializers.Serializer):
             msg = _('Unable to authenticate with provided credentials')
             raise serializers.ValidationError(msg, code='authorization')
 
+        if not user.verified:
+            msg = _('Please verify your email address before trying to login')
+            raise serializers.ValidationError(msg, code='authorization')
+
         attrs['user'] = user
         return attrs

@@ -67,11 +67,22 @@ class PublicUserApiTests(TestCase):
     def test_create_token_for_user(self):
         """Test that a token is created for the user"""
         payload = {'email': 'test@simpletechture.nl', 'password': 'testpass'}
-        create_user(**payload)
+        user = create_user(**payload)
+        user.verified = True
+        user.save()
         res = self.client.post(TOKEN_URL, payload)
 
         self.assertIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_no_token_is_created_when_not_verified(self):
+        """Test that no token can be created for the user when not verified."""
+        payload = {'email': 'test@simpletechture.nl', 'password': 'testpass'}
+        create_user(**payload)
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn('token', res.data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_create_token_invalid_credentials(self):
         """Test that token is not created if invalid credentials are given"""
@@ -166,4 +177,3 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(self.user.name, payload['name'])
         self.assertTrue(self.user.check_password(payload['password']))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
-

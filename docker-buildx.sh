@@ -1,5 +1,5 @@
 #!/bin/bash
-VERSION="0.1.7"
+VERSION="0.1.10"
 APP="pkalkman/tinychain"
 docker buildx build -f ./Dockerfile -t $APP:$VERSION . --load
 docker push $APP:$VERSION

@@ -34,8 +34,7 @@ services:
 
   app:
     image: pkalkman/tinychain:0.1.8
-    command:
-      entrypoint.sh
+    command: entrypoint.sh
     expose:
       - 8000
     networks:
@@ -57,8 +56,9 @@ services:
 
   celery:
     image: pkalkman/tinychain:0.1.8
-    command:
-      celery -A app worker -l info
+    command: celery -A app worker -l info
+    networks:
+      - proxy
     environment:
         - DB_HOST=db
         - DB_NAME=app
@@ -73,6 +73,8 @@ services:
   celery-beat:
     image: pkalkman/tinychain:0.1.8
     command: celery -A app beat -l info
+    networks:
+      - proxy
     environment:
       - DB_HOST=db
       - DB_NAME=app
@@ -80,14 +82,14 @@ services:
       - DB_PASS=supersecretpassword
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-  volumes:
-      - ./app:/app
     depends_on:
       - db
       - redis
 
   redis:
     image: redis:6.0-alpine
+    networks:
+      - proxy
 
   db:
     image: postgres:10-alpine

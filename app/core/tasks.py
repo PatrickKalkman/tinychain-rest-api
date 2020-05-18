@@ -10,10 +10,9 @@ from app.celery import app
 
 @app.task
 def send_verification_email(user_id):
-    print('sending email')
     UserModel = get_user_model()
     try:
-        base = 'http://localhost:8000'
+        base = 'https://tinychain-api.simpletechture.nl'
         user = UserModel.objects.get(pk=user_id)
         validate_link = reverse('user:validate')
         url = f'{base}{validate_link}?verification_id={user.verification_id}'
@@ -25,7 +24,7 @@ def send_verification_email(user_id):
         html_content = f'<p>Hello {user.name},</p>'
         html_content += '<p>Welcome to the TinyChain platform,'
         html_content += 'please verify your email adress by clicking '
-        html_content += f'<a href="{url}">this</a> link.</p><br>'
+        html_content += f'<a href="{url}">this</a> link.</p>'
         html_content += '<p>Kind regards, <br> The TinyChain team.</p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
