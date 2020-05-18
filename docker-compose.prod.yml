@@ -34,6 +34,8 @@ services:
 
   app:
     image: pkalkman/tinychain:0.1.8
+    command:
+      entrypoint.sh
     expose:
       - 8000
     networks:
@@ -53,20 +55,36 @@ services:
       - "traefik.http.routers.app.entrypoints=https"
       - "traefik.http.routers.app.tls.certresolver=http"
 
-    celery:
-      image: pkalkman/tinychain:0.1.8
-      command:
-        celery -A app worker -l info
-      environment:
-          - DB_HOST=db
-          - DB_NAME=app
-          - DB_USER=postgres
-          - DB_PASS=supersecretpassword
-          - REDIS_HOST=redis
-          - REDIS_PORT=6379
-      depends_on:
-          - redis
-          - db
+  celery:
+    image: pkalkman/tinychain:0.1.8
+    command:
+      celery -A app worker -l info
+    environment:
+        - DB_HOST=db
+        - DB_NAME=app
+        - DB_USER=postgres
+        - DB_PASS=supersecretpassword
+        - REDIS_HOST=redis
+        - REDIS_PORT=6379
+    depends_on:
+        - redis
+        - db
+
+  celery-beat:
+    image: pkalkman/tinychain:0.1.8
+    command: celery -A app beat -l info
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+  volumes:
+      - ./app:/app
+    depends_on:
+      - db
+      - redis
 
   redis:
     image: redis:6.0-alpine

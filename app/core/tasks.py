@@ -22,11 +22,11 @@ def send_verification_email(user_id):
         from_email = 'tinychain_verify@gmail.com'
         to = user.email
         text_content = 'Welcome to the TinyChain platform.'
-        html_content = f'<p>Hello {user.name},</p><br>'
+        html_content = f'<p>Hello {user.name},</p>'
         html_content += '<p>Welcome to the TinyChain platform,'
         html_content += 'please verify your email adress by clicking '
-        html_content += f'<a href="{url}">this</a> link.</p><br><br>'
-        html_content += '<p>Kind regards, <br> The TinyChain team.'
+        html_content += f'<a href="{url}">this</a> link.</p><br>'
+        html_content += '<p>Kind regards, <br> The TinyChain team.</p>'
         msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
         msg.attach_alternative(html_content, "text/html")
         msg.content_subtype = "html"  # Main content is now text/html
