@@ -7,6 +7,7 @@ from rest_framework import status
 
 
 CREATE_USER_URL = reverse('user:create')
+CREATE_APPLE_USER_URL = reverse('user:createapple')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
 ME_VALIDATE = reverse('user:validate')
@@ -37,9 +38,29 @@ class PublicUserApiTests(TestCase):
         self.assertTrue(
             user.check_password(payload['password'])
         )
-        self.assertFalse(user.verified)
+        self.assertFalse(user.is_verified)
         self.assertNotIn('password', res.data)
         self.assertIsNotNone(user.verification_id)
+
+    def test_create_valid_apple_user_success(self):
+        """Test creating apple user with a valid payload is successful"""
+        payload = {
+            'email': 'test@simpletechture.nl',
+            'password': 'testpass',
+            'name': 'name',
+            'apple_user_id': '123123.232334aa'
+        }
+        res = self.client.post(CREATE_APPLE_USER_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        user = get_user_model().objects.get(**res.data)
+        self.assertTrue(
+            user.check_password(payload['password'])
+        )
+        self.assertTrue(user.is_verified)
+        self.assertTrue(user.is_apple_user)
+
+        self.assertNotIn('password', res.data)
+        self.assertEqual(payload['apple_user_id'], user.apple_user_id)
 
     def test_user_exists(self):
         """Test creating a user that already exists fails"""
@@ -68,7 +89,7 @@ class PublicUserApiTests(TestCase):
         """Test that a token is created for the user"""
         payload = {'email': 'test@simpletechture.nl', 'password': 'testpass'}
         user = create_user(**payload)
-        user.verified = True
+        user.is_verified = True
         user.save()
         res = self.client.post(TOKEN_URL, payload)
 
@@ -124,7 +145,7 @@ class PublicUserApiTests(TestCase):
         res = self.client.get(url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.user.refresh_from_db()
-        self.assertTrue(self.user.verified)
+        self.assertTrue(self.user.is_verified)
 
     def test_no_verification_id_returns_bad_request(self):
         """Test that calling without verification id return error"""

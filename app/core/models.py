@@ -28,6 +28,19 @@ class UserManager(BaseUserManager):
 
         return user
 
+    def create_apple_user(self, email, password, **extra_fields):
+        """Creates and saves an apple user, """
+        """user signed in to the app using their Apple id"""
+        if not email:
+            raise ValueError('Users must have an email address')
+        user = self.model(email=self.normalize_email(email), **extra_fields)
+        user.is_apple_user = True
+        user.is_verified = True
+        user.set_password(password)
+        user.save(using=self._db)
+
+        return user
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """Custom user model that supports using email instead of username"""
@@ -35,7 +48,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     name = models.CharField(max_length=255)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    verified = models.BooleanField(default=False)
+    is_apple_user = models.BooleanField(default=False)
+    apple_user_id = models.CharField(max_length=255, default='')
+    is_verified = models.BooleanField(default=False)
     verification_id = models.UUIDField(default=uuid.uuid4, editable=False)
 
     objects = UserManager()
@@ -45,11 +60,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 def user_post_save(sender, instance, signal, *args, **kwargs):
     if not instance.verified:
-        # Send verification email
         send_verification_email.delay(instance.pk)
 
 
-models.signals.post_save.connect(user_post_save, sender=User)
+# models.signals.post_save.connect(user_post_save, sender=User)
 
 
 class Alert(models.Model):

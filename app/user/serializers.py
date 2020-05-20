@@ -28,6 +28,22 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class AppleUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = get_user_model()
+        fields = ('email', 'password', 'name', 'apple_user_id')
+        extra_kwargs = {'password': {'write_only': True, 'min_length': 5}}
+
+    def create(self, validated_data):
+        """Create a new user with encrypted password and return it"""
+        user = get_user_model().objects.create_user(**validated_data)
+        user.is_apple_user = True
+        user.is_verified = True
+        user.save()
+        return user
+
+
 class AuthTokenSerializer(serializers.Serializer):
     """Serializer for the user authentication object"""
     email = serializers.CharField()
@@ -50,7 +66,7 @@ class AuthTokenSerializer(serializers.Serializer):
             msg = _('Unable to authenticate with provided credentials')
             raise serializers.ValidationError(msg, code='authorization')
 
-        if not user.verified:
+        if not user.is_verified:
             msg = _('Please verify your email address before trying to login')
             raise serializers.ValidationError(msg, code='authorization')
 

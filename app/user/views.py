@@ -5,13 +5,19 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from user.serializers import UserSerializer, AuthTokenSerializer
+from user.serializers import UserSerializer, AppleUserSerializer,\
+                            AuthTokenSerializer
 from core.models import User
 
 
 class CreateUserView(generics.CreateAPIView):
     """Create a new user in the system"""
     serializer_class = UserSerializer
+
+
+class CreateAppleUserView(generics.CreateAPIView):
+    """Create a new apple user in the system"""
+    serializer_class = AppleUserSerializer
 
 
 class CreateTokenView(ObtainAuthToken):
@@ -38,7 +44,7 @@ class ValidateApiView(APIView):
             users = User.objects.filter(verification_id=verification_id)
             if users.count() == 1:
                 user = users[0]
-                user.verified = True
+                user.is_verified = True
                 user.save()
                 return Response({'message': 'User is verified'})
 
