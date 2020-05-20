@@ -26,7 +26,7 @@ class CreateTokenView(ObtainAuthToken):
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 
-class ManageUserView(generics.RetrieveUpdateAPIView):
+class ManageUserView(generics.RetrieveUpdateDestroyAPIView):
     """Manage the authenticated user"""
     serializer_class = UserSerializer
     authentication_classes = (authentication.TokenAuthentication,)
@@ -34,6 +34,11 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+    def destroy(self, request, pk=None):
+        self.request.user.is_active = False
+        self.request.user.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ValidateApiView(APIView):

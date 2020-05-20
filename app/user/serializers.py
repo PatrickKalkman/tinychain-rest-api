@@ -70,5 +70,9 @@ class AuthTokenSerializer(serializers.Serializer):
             msg = _('Please verify your email address before trying to login')
             raise serializers.ValidationError(msg, code='authorization')
 
+        if not user.is_active:
+            msg = _('User is deleted or not active')
+            raise serializers.ValidationError(msg, code='authorization')
+
         attrs['user'] = user
         return attrs

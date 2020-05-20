@@ -105,6 +105,18 @@ class PublicUserApiTests(TestCase):
         self.assertNotIn('token', res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_no_token_is_created_when_not_active(self):
+        """Test that no token can be created for the user when not active."""
+        payload = {'email': 'test@simpletechture.nl', 'password': 'testpass',
+                   'is_verified': 'True'}
+        user = create_user(**payload)
+        user.is_active = False
+        user.save()
+        res = self.client.post(TOKEN_URL, payload)
+
+        self.assertNotIn('token', res.data)
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_create_token_invalid_credentials(self):
         """Test that token is not created if invalid credentials are given"""
         create_user(email='test@simpletechture.nl', password='testpass')
@@ -198,3 +210,11 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(self.user.name, payload['name'])
         self.assertTrue(self.user.check_password(payload['password']))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_delete_user_profile(self):
+        """Test deleting the user profile for authenticated user"""
+        res = self.client.delete(ME_URL)
+        self.user.refresh_from_db()
+
+        self.assertFalse(self.user.is_active)
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
