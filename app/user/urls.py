@@ -10,5 +10,6 @@ urlpatterns = [
          name='createapple'),
     path('token/', views.CreateTokenView.as_view(), name='token'),
     path('me/', views.ManageUserView.as_view(), name='me'),
+    path('appleme/', views.AppleUserApiView.as_view(), name='appleme'),
     path('validate/', views.ValidateApiView.as_view(), name='validate'),
 ]

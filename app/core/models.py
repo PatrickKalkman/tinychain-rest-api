@@ -59,11 +59,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 def user_post_save(sender, instance, signal, *args, **kwargs):
-    if not instance.verified:
+    if not instance.is_verified and settings.DEBUG:
         send_verification_email.delay(instance.pk)
 
 
-# models.signals.post_save.connect(user_post_save, sender=User)
+models.signals.post_save.connect(user_post_save, sender=User)
 
 
 class Alert(models.Model):

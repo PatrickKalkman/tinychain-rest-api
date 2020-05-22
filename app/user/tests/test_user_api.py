@@ -10,6 +10,7 @@ CREATE_USER_URL = reverse('user:create')
 CREATE_APPLE_USER_URL = reverse('user:createapple')
 TOKEN_URL = reverse('user:token')
 ME_URL = reverse('user:me')
+APPLE_ME_URL = reverse('user:appleme')
 ME_VALIDATE = reverse('user:validate')
 
 
@@ -181,6 +182,15 @@ class PrivateUserApiTests(TestCase):
             password='testpass',
             name='fname',
         )
+        self.appleuser = create_user(
+            email='testapple@simpletechture.nl',
+            password='testpass',
+            name='apple name',
+            apple_user_id='1234567890',
+            is_apple_user=True,
+            is_verified=True
+        )
+
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
 
@@ -193,6 +203,26 @@ class PrivateUserApiTests(TestCase):
             'name': self.user.name,
             'email': self.user.email,
         })
+
+    def test_retrieve_appleuser_profile_success(self):
+        """Test retrieving profile for apple user"""
+
+        url = f'{APPLE_ME_URL}?apple_user_id={self.appleuser.apple_user_id}'
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, {
+            'name': self.appleuser.name,
+            'email': self.appleuser.email,
+        })
+
+    def test_retrieve_appleuser_notfound(self):
+        """Test retrieving profile for non existing apple user"""
+
+        url = f'{APPLE_ME_URL}?apple_user_id=1234'
+        res = self.client.get(url)
+
+        self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_me_not_allowed(self):
         """Test that POST is not allowed on the me URL"""

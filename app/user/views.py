@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from user.serializers import UserSerializer, AppleUserSerializer,\
-                            AuthTokenSerializer
+    AuthTokenSerializer
 from core.models import User
 
 
@@ -52,6 +52,22 @@ class ValidateApiView(APIView):
                 user.is_verified = True
                 user.save()
                 return Response({'message': 'User is verified'})
+
+        return Response({'message': 'invalid request'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class AppleUserApiView(APIView):
+
+    def get(self, request, format=None):
+        apple_user_id = request.query_params.get('apple_user_id')
+        if apple_user_id:
+            users = User.objects.filter(apple_user_id=apple_user_id)
+            if users.count() == 1:
+                serializer = UserSerializer(users[0])
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response(status=status.HTTP_404_NOT_FOUND)
 
         return Response({'message': 'invalid request'},
                         status=status.HTTP_400_BAD_REQUEST)
