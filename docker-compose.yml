@@ -29,12 +29,12 @@ services:
     command:
       celery -A app worker -l info
     environment:
-        - DB_HOST=db
-        - DB_NAME=app
-        - DB_USER=postgres
-        - DB_PASS=supersecretpassword
-        - REDIS_HOST=redis
-        - REDIS_PORT=6379
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     depends_on:
         - redis
         - db
@@ -42,6 +42,13 @@ services:
   celery-beat:
     build: .
     command: celery -A app beat -l info
+    environment:
+      - DB_HOST=db
+      - DB_NAME=app
+      - DB_USER=postgres
+      - DB_PASS=supersecretpassword
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     volumes:
       - ./app:/app
     depends_on:

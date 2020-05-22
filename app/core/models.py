@@ -59,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 def user_post_save(sender, instance, signal, *args, **kwargs):
-    if not instance.is_verified and settings.DEBUG:
+    if not (instance.is_verified or instance.is_apple_user):
         send_verification_email.delay(instance.pk)
 
 
