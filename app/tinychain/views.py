@@ -9,7 +9,8 @@ from tinychain import serializers
 
 class AlertViewSet(viewsets.GenericViewSet,
                    mixins.ListModelMixin,
-                   mixins.CreateModelMixin):
+                   mixins.CreateModelMixin,
+                   mixins.DestroyModelMixin):
     """Manage Alerts in the database."""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)

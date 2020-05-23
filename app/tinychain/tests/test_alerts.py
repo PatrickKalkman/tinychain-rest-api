@@ -91,3 +91,16 @@ class PrivateAlertsApiTests(TestCase):
         res = self.client.post(ALERTS_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Alert.objects.count(), 1)
+
+    def test_delete_alert_succeeds(self):
+        alert = Alert.objects.create(user=self.user,
+                                     exchange='Kraken',
+                                     coinpair='EUR:BTC',
+                                     indicator='>',
+                                     limit=8200.00)
+
+        res = self.client.delete(f'{ALERTS_URL}{alert.id}/')
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(Alert.objects.count(), 0)

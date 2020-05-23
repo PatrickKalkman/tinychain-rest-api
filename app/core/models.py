@@ -63,14 +63,19 @@ def user_post_save(sender, instance, signal, *args, **kwargs):
         send_verification_email.delay(instance.pk)
 
 
-models.signals.post_save.connect(user_post_save, sender=User)
+def connect():
+    models.signals.post_save.connect(user_post_save, sender=User)
+
+
+if not settings.DEBUG:
+    connect()
 
 
 class Alert(models.Model):
     """Alert model to define a custom alert"""
     exchange = models.CharField(max_length=255)
     coinpair = models.CharField(max_length=255)
-    indicator = models.CharField(max_length=1)
+    indicator = models.CharField(max_length=255)
     limit = models.DecimalField(max_digits=10, decimal_places=5)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
