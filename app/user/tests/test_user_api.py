@@ -46,9 +46,9 @@ class PublicUserApiTests(TestCase):
     def test_create_valid_apple_user_success(self):
         """Test creating apple user with a valid payload is successful"""
         payload = {
-            'email': '',
-            'password': '',
-            'name': '',
+            'email': 'email@test.nl',
+            'password': 'password',
+            'name': 'name',
             'apple_user_id': '123123.232334aa'
         }
         res = self.client.post(CREATE_APPLE_USER_URL, payload)

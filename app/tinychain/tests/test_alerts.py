@@ -80,3 +80,14 @@ class PrivateAlertsApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['coinpair'], alert.coinpair)
+
+    def test_create_alert_succeeds(self):
+        payload = {
+            "exchange": "Kraken",
+            "coinpair": "EURBTC",
+            "indicator": ">",
+            "limit": 8000.65
+        }
+        res = self.client.post(ALERTS_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
