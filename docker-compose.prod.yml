@@ -53,8 +53,6 @@ services:
       - 8000
     networks:
         - proxy
-    volumes:
-      - static_volume:/app/staticfiles
     <<: *environment
     depends_on:
       - db
@@ -108,4 +106,3 @@ volumes:
 
 networks:
   proxy:
-    external: true
