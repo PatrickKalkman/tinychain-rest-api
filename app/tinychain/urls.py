@@ -6,6 +6,7 @@ from tinychain import views
 
 router = DefaultRouter()
 router.register('alerts', views.AlertViewSet)
+router.register('devicetokens', views.DeviceTokenViewSet)
 
 app_name = 'tinychain'
 

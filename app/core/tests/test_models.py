@@ -56,3 +56,13 @@ class ModelTests(TestCase):
 
         self.assertEquals(str(alert),
                           f'{alert.coinpair} {alert.indicator} {alert.limit}')
+
+    def test_devicetoken_str(self):
+        device_token = models.DeviceToken.objects.create(
+            user=sample_user(),
+            token='1232312323',
+            device_type='IOS'
+        )
+
+        self.assertEquals(str(device_token),
+                          f'{device_token.device_type} {device_token.token}')

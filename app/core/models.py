@@ -1,4 +1,5 @@
 import uuid
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, \
@@ -84,3 +85,27 @@ class Alert(models.Model):
 
     def __str__(self):
         return f'{self.coinpair} {self.indicator} {self.limit}'
+
+
+class DeviceToken(models.Model):
+    """Device token model to store device tokens"""
+
+    class DeviceTypes(models.TextChoices):
+        IOS = 'IOS', _('IOS')
+        ANDROID = 'ADR', _('ANDROID')
+        WINDOWS = 'WIN', _('WINDOWS')
+        MACOS = 'MAC', _('MACOS')
+
+    token = models.CharField(max_length=255)
+    device_type = models.CharField(
+        max_length=3,
+        choices=DeviceTypes.choices,
+        default=DeviceTypes.IOS
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'{self.device_type} {self.token}'
