@@ -5,6 +5,5 @@ gunicorn>=20.0.4,<20.1.0
 Celery>=4.4.2, <4.5.0
 redis>=3.5.2, <3.6.0
 python-dotenv>=0.13.0
-django-grappelli>=2.14.2, <2.15.0
 
 flake8>=3.7.9,<3.8.0
