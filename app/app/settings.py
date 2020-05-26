@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '0#8g4+tp9#2+xccm+w=yim1f)14w+j4epz+hc8%u8gsh380%)i'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True 
+DEBUG = os.environ['DEBUG_VALUE'] == 'TRUE'
 
 ALLOWED_HOSTS = ['*']
 
@@ -140,12 +140,13 @@ CELERY_RESULT_BACKEND = 'redis://redis:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
-# CELERY_BEAT_SCHEDULE = {
-#     'hello': {
-#         'task': 'app.tasks.hello',
-#         'schedule': crontab()  # execute every minute
-#     }
-# }
+
+CELERY_BEAT_SCHEDULE = {
+    'process-alerts': {
+         'task': 'tinychain.tasks.process_alerts',
+         'schedule': 60.0,
+     }
+}
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True

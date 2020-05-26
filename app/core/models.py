@@ -68,6 +68,7 @@ def connect():
     models.signals.post_save.connect(user_post_save, sender=User)
 
 
+"""Only connect email when running in production"""
 if not settings.DEBUG:
     connect()
 
@@ -96,7 +97,7 @@ class DeviceToken(models.Model):
         WINDOWS = 'WIN', _('WINDOWS')
         MACOS = 'MAC', _('MACOS')
 
-    token = models.CharField(max_length=255)
+    token = models.CharField(max_length=255, unique=True)
     device_type = models.CharField(
         max_length=3,
         choices=DeviceTypes.choices,

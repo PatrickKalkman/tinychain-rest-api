@@ -69,8 +69,8 @@ services:
       - proxy
     <<: *environment
     depends_on:
-        - redis
-        - db
+      - redis
+      - db
 
   celery-beat:
     <<: *tinychain
