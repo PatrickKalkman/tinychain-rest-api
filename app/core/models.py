@@ -79,6 +79,7 @@ class Alert(models.Model):
     coinpair = models.CharField(max_length=255)
     indicator = models.CharField(max_length=255)
     limit = models.DecimalField(max_digits=10, decimal_places=5)
+    is_active = models.BooleanField(default=False)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
