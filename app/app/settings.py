@@ -154,3 +154,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_PORT = 587
+
+PUSH_AUTH_KEY_PATH=os.environ.get('PUSH_AUTH_KEY_PATH')
+PUSH_AUTH_KEY_ID=os.environ.get('PUSH_AUTH_KEY_ID')
+PUSH_AUTH_TEAM_ID=os.environ.get('PUSH_AUTH_TEAM_ID')
+PUSH_AUTH_TOPIC=os.environ.get('PUSH_AUTH_TOPIC')

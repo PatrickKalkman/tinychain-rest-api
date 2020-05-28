@@ -1,8 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from core.models import Alert
-from tinychain.alerting import AlertProcessor
+from core.models import Alert, DeviceToken
+from tinychain.alerting import AlertProcessor, Notifier
 
 from unittest.mock import patch
 
@@ -150,3 +150,31 @@ class AlertProcessorTest(TestCase):
                 }
             }
         }
+
+
+class NotifierTest(TestCase):
+
+    def setUp(self):
+
+        self.user = get_user_model().objects.create_user(
+            'test@simpletechture.nl',
+            'test123'
+        )
+
+        self.token = ('a636d7119f09b48e4540604838'
+                      'e06610b6e05918f41c15cd8036faf28aee4e38')
+        self.deviceToken = DeviceToken.objects.create(user=self.user,
+                                                      device_type='IOS',
+                                                      token=self.token)
+
+        self.alert = Alert.objects.create(user=self.user,
+                                          exchange='Kraken',
+                                          coinpair='XBT:EUR',
+                                          indicator='>',
+                                          limit=100.00,
+                                          is_active=True,
+                                          trigger_value=105.23)
+
+    def test_sending_notification(self):
+        notifier = Notifier()
+        notifier.notifyAlerts()

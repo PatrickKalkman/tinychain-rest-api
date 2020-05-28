@@ -51,11 +51,15 @@ class ModelTests(TestCase):
             exchange='kraken',
             coinpair='BTC:EUR',
             indicator='>',
-            limit=8412.54
+            limit=8412.54,
+            trigger_value=8515.00
         )
 
-        self.assertEquals(str(alert),
-                          f'{alert.coinpair} {alert.indicator} {alert.limit}')
+        str_alert = (f'({alert.coinpair} {alert.indicator} '
+                     f'{alert.limit:.2f}) -> Price = '
+                     f'{alert.trigger_value:.2f}')
+
+        self.assertEquals(str(alert), str_alert)
 
     def test_devicetoken_str(self):
         device_token = models.DeviceToken.objects.create(

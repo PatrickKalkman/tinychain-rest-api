@@ -80,13 +80,36 @@ class Alert(models.Model):
     indicator = models.CharField(max_length=255)
     limit = models.DecimalField(max_digits=10, decimal_places=5)
     is_active = models.BooleanField(default=False)
+    trigger_value = models.DecimalField(max_digits=10,
+                                        decimal_places=5,
+                                        default=0)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
 
     def __str__(self):
-        return f'{self.coinpair} {self.indicator} {self.limit}'
+        return (f'({self.coinpair} {self.indicator} '
+                f'{self.limit:.2f}) -> Price = '
+                f'{self.trigger_value:.2f}')
+
+
+class NotificationHistory(models.Model):
+    """Logs all notification and result"""
+    notification_result = models.CharField(max_length=255)
+    succeeded = models.BooleanField(default=False)
+    notified_at = models.DateTimeField(auto_now_add=True, blank=True)
+    alert = models.ForeignKey(
+        Alert,
+        on_delete=models.SET_NULL,
+        blank=True, null=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'{self.notified_at} {self.succeeded} {self.alert}'
 
 
 class DeviceToken(models.Model):
