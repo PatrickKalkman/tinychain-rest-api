@@ -144,7 +144,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_BEAT_SCHEDULE = {
     'process-alerts': {
          'task': 'tinychain.tasks.process_alerts',
-         'schedule': 60.0,
+         'schedule': 300.0,
      }
 }
 

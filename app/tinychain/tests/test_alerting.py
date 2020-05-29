@@ -107,6 +107,27 @@ class AlertProcessorTest(TestCase):
         alert.refresh_from_db()
         self.assertFalse(alert.is_active)
 
+    @patch('krakenex.API.query_public')
+    def test_active_notified_alert_reset(self, mock_query_public):
+        """Test if higher alert does not become active"""
+
+        mock_query_public.return_value = self.generate_json(9000.0)
+
+        alert = Alert.objects.create(user=self.user,
+                                     exchange='Kraken',
+                                     coinpair='XBT:EUR',
+                                     indicator='>',
+                                     limit=10000.00,
+                                     is_active=True,
+                                     is_notified=True)
+
+        alert_processor = AlertProcessor()
+        alert_processor.process()
+
+        alert.refresh_from_db()
+        self.assertFalse(alert.is_active)
+        self.assertFalse(alert.is_notified)
+
     def generate_json(self, price):
         return {
             "error": [],
@@ -180,6 +201,17 @@ class NotifierTest(TestCase):
         mock_send_notification_batch.return_value = {'result': 'Succes'}
 
         notifier = Notifier()
+        notifier.notifyAlerts()
+
+        number_records = NotificationHistory.objects.all().count()
+        self.assertEqual(number_records, 1)
+
+    @patch('apns2.client.APNsClient.send_notification_batch')
+    def test_not_send_already_active(self, mock_send_notification_batch):
+        mock_send_notification_batch.return_value = {'result': 'Succes'}
+
+        notifier = Notifier()
+        notifier.notifyAlerts()
         notifier.notifyAlerts()
 
         number_records = NotificationHistory.objects.all().count()

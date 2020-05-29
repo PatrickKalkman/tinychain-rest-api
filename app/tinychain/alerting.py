@@ -30,6 +30,11 @@ class AlertProcessor:
             lower = '<' in alert.indicator and price < limit
 
             alert.is_active = higher or lower
+
+            # reset the notified bit when going from active to not active
+            if alert.is_notified and not alert.is_active:
+                alert.is_notified = False
+
             alert.trigger_value = price if alert.is_active else 0
             alert.save()
 
@@ -53,18 +58,23 @@ class Notifier:
         for alert in active_alerts:
             deviceTokens = DeviceToken.objects.all().filter(user=alert.user)
             if deviceTokens.count() > 0:
+                if not alert.is_notified:
+                    payload_alert = PayloadAlert(
+                        title='Price alert',
+                        body=str(alert),
+                    )
 
-                payload_alert = PayloadAlert(
-                    title='Price alert',
-                    body=str(alert),
-                )
+                    payload = Payload(alert=payload_alert,
+                                      sound='chime', badge=1)
+                    result = self.send_push_message(
+                        deviceTokens[0].token, payload)
+                    alert.is_notified = True
+                    alert.save()
 
-                payload = Payload(alert=payload_alert,
-                                  sound='chime', badge=1)
-
-                result = self.send_push_message(deviceTokens[0].token, payload)
-
-                self.save_alert_history(result, alert, alert.user)
+                    self.save_alert_history(result, alert, alert.user)
+                else:
+                    self.logger.info(
+                        'Not sending alert, was already notified')
             else:
                 self.logger.info(
                     'Could not send alert, no device token was found')
@@ -83,6 +93,8 @@ class Notifier:
 
         res = client.send_notification_batch(
             notifications=notifications, topic=settings.PUSH_AUTH_TOPIC)
+
+        self.logger.info(res)
 
         return res
 

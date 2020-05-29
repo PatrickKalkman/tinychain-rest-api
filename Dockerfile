@@ -21,6 +21,8 @@ RUN mkdir /app/staticfiles && chown -R user:user /app/staticfiles
 COPY --chown=user:user ./app/ /app
 RUN chown user.user /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+RUN rm /app/app/.env
+RUN rm /app/apnscert/AuthKey_FP92KAS2J7.p8
 
 WORKDIR /app
 

@@ -8,3 +8,6 @@ from tinychain import alerting
 def process_alerts():
     alertProcessor = alerting.AlertProcessor()
     alertProcessor.process()
+
+    notifier = alerting.Notifier()
+    notifier.notifyAlerts()

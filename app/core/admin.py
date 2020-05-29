@@ -35,3 +35,4 @@ class UserAdmin(BaseUserAdmin):
 admin.site.register(models.User, UserAdmin)
 admin.site.register(models.Alert)
 admin.site.register(models.DeviceToken)
+admin.site.register(models.NotificationHistory)

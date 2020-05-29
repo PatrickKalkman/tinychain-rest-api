@@ -80,6 +80,7 @@ class Alert(models.Model):
     indicator = models.CharField(max_length=255)
     limit = models.DecimalField(max_digits=10, decimal_places=5)
     is_active = models.BooleanField(default=False)
+    is_notified = models.BooleanField(default=False)
     trigger_value = models.DecimalField(max_digits=10,
                                         decimal_places=5,
                                         default=0)
