@@ -2,6 +2,7 @@ import collections
 
 from app.logger import get_module_logger
 from core.models import Alert, DeviceToken
+from core import models
 from django.conf import settings
 from decimal import Decimal
 
@@ -60,7 +61,10 @@ class Notifier:
 
                 payload = Payload(alert=payload_alert,
                                   sound='chime', badge=1)
-                self.send_push_message(deviceTokens[0].token, payload)
+
+                result = self.send_push_message(deviceTokens[0].token, payload)
+
+                self.save_alert_history(result, alert, alert.user)
             else:
                 self.logger.info(
                     'Could not send alert, no device token was found')
@@ -81,3 +85,11 @@ class Notifier:
             notifications=notifications, topic=settings.PUSH_AUTH_TOPIC)
 
         return res
+
+    def save_alert_history(self, result, alert, user):
+        models.NotificationHistory.objects.create(
+            user=user,
+            alert=alert,
+            succeeded='Success' in result,
+            notification_result=result
+        )

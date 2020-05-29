@@ -9,6 +9,17 @@ def sample_user(email='admin@example.com', password='testpass'):
     return get_user_model().objects.create_user(email, password)
 
 
+def sample_alert(user):
+    return models.Alert.objects.create(
+        user=user,
+        exchange='kraken',
+        coinpair='BTC:EUR',
+        indicator='>',
+        limit=8412.54,
+        trigger_value=8515.00
+    )
+
+
 class ModelTests(TestCase):
 
     def test_create_user_with_email_successful(self):
@@ -70,3 +81,17 @@ class ModelTests(TestCase):
 
         self.assertEquals(str(device_token),
                           f'{device_token.device_type} {device_token.token}')
+
+    def test_notificationhistory_str(self):
+        user = sample_user()
+        notification_history = models.NotificationHistory.objects.create(
+            user=user,
+            alert=sample_alert(user),
+            succeeded=True,
+            notification_result='hallo'
+        )
+
+        self.assertEquals(str(notification_history),
+                          (f'{notification_history.notified_at} '
+                           f'{notification_history.succeeded} '
+                           f'{notification_history.alert}'))

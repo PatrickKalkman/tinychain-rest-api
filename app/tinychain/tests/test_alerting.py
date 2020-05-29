@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from core.models import Alert, DeviceToken
+from core.models import Alert, DeviceToken, NotificationHistory
 from tinychain.alerting import AlertProcessor, Notifier
 
 from unittest.mock import patch
@@ -175,6 +175,12 @@ class NotifierTest(TestCase):
                                           is_active=True,
                                           trigger_value=105.23)
 
-    def test_sending_notification(self):
+    @patch('apns2.client.APNsClient.send_notification_batch')
+    def test_sending_notification(self, mock_send_notification_batch):
+        mock_send_notification_batch.return_value = {'result': 'Succes'}
+
         notifier = Notifier()
         notifier.notifyAlerts()
+
+        number_records = NotificationHistory.objects.all().count()
+        self.assertEqual(number_records, 1)
