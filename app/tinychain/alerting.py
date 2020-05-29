@@ -71,7 +71,8 @@ class Notifier:
                     alert.is_notified = True
                     alert.save()
 
-                    self.save_alert_history(result, alert, alert.user)
+                    self.save_alert_history(result.get(deviceTokens[0].token),
+                                            alert, alert.user)
                 else:
                     self.logger.info(
                         'Not sending alert, was already notified')

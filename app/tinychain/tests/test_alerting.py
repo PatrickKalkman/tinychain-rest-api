@@ -198,7 +198,7 @@ class NotifierTest(TestCase):
 
     @patch('apns2.client.APNsClient.send_notification_batch')
     def test_sending_notification(self, mock_send_notification_batch):
-        mock_send_notification_batch.return_value = {'result': 'Succes'}
+        mock_send_notification_batch.return_value = {self.token: 'Succes'}
 
         notifier = Notifier()
         notifier.notifyAlerts()
@@ -208,7 +208,7 @@ class NotifierTest(TestCase):
 
     @patch('apns2.client.APNsClient.send_notification_batch')
     def test_not_send_already_active(self, mock_send_notification_batch):
-        mock_send_notification_batch.return_value = {'result': 'Succes'}
+        mock_send_notification_batch.return_value = {self.token: 'Succes'}
 
         notifier = Notifier()
         notifier.notifyAlerts()
