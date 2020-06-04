@@ -143,9 +143,9 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 CELERY_BEAT_SCHEDULE = {
     'process-alerts': {
-         'task': 'tinychain.tasks.process_alerts',
-         'schedule': 300.0,
-     }
+        'task': 'tinychain.tasks.process_alerts',
+        'schedule': 300.0,
+    }
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -155,7 +155,7 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 EMAIL_PORT = 587
 
-PUSH_AUTH_KEY_PATH=os.environ.get('PUSH_AUTH_KEY_PATH')
-PUSH_AUTH_KEY_ID=os.environ.get('PUSH_AUTH_KEY_ID')
-PUSH_AUTH_TEAM_ID=os.environ.get('PUSH_AUTH_TEAM_ID')
-PUSH_AUTH_TOPIC=os.environ.get('PUSH_AUTH_TOPIC')
+PUSH_AUTH_KEY_PATH = os.environ.get('PUSH_AUTH_KEY_PATH')
+PUSH_AUTH_KEY_ID = os.environ.get('PUSH_AUTH_KEY_ID')
+PUSH_AUTH_TEAM_ID = os.environ.get('PUSH_AUTH_TEAM_ID')
+PUSH_AUTH_TOPIC = os.environ.get('PUSH_AUTH_TOPIC')

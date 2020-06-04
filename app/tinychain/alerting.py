@@ -54,28 +54,25 @@ class Notifier:
     logger = get_module_logger(__name__)
 
     def notifyAlerts(self):
-        active_alerts = Alert.objects.all().filter(is_active=True)
-        for alert in active_alerts:
+        active_silent_alerts = Alert.objects.all().filter(is_active=True,
+                                                          is_notified=False)
+        for alert in active_silent_alerts:
             deviceTokens = DeviceToken.objects.all().filter(user=alert.user)
             if deviceTokens.count() > 0:
-                if not alert.is_notified:
-                    payload_alert = PayloadAlert(
-                        title='Price alert',
-                        body=str(alert),
-                    )
+                payload_alert = PayloadAlert(
+                    title='Price alert',
+                    body=str(alert),
+                )
 
-                    payload = Payload(alert=payload_alert,
-                                      sound='chime', badge=1)
-                    result = self.send_push_message(
-                        deviceTokens[0].token, payload)
-                    alert.is_notified = True
-                    alert.save()
+                payload = Payload(alert=payload_alert,
+                                  sound='chime', badge=1)
+                result = self.send_push_message(
+                    deviceTokens[0].token, payload)
+                alert.is_notified = True
+                alert.save()
 
-                    self.save_alert_history(result.get(deviceTokens[0].token),
-                                            alert, alert.user)
-                else:
-                    self.logger.info(
-                        'Not sending alert, was already notified')
+                self.save_alert_history(result.get(deviceTokens[0].token),
+                                        alert, alert.user)
             else:
                 self.logger.info(
                     'Could not send alert, no device token was found')
