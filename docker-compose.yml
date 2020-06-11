@@ -67,6 +67,13 @@ services:
 
   redis:
     image: redis:6.0-alpine
+  
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
 
 
     

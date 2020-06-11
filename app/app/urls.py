@@ -21,7 +21,8 @@ urlpatterns = [
     path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
     path('api/user/', include('user.urls')),
-    path('api/tinychain/', include('tinychain.urls'))
+    path('api/tinychain/', include('tinychain.urls')),
+    path('', include('django_prometheus.urls')),
 ]
 
 urlpatterns += staticfiles_urlpatterns()
